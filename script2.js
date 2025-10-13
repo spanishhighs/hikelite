@@ -75,11 +75,15 @@ class HikeLite {
                     if (this.currentTab === 'packing') {
                         e.preventDefault();
                         this.togglePackingMenu();
+                        // Close the mobile menu after selection
+                        this.closeMobileMenu();
                         return;
                     }
                 }
                 
                 this.switchTab(tab);
+                // Close the mobile menu after switching tabs
+                this.closeMobileMenu();
             });
         });
 
