@@ -349,6 +349,7 @@ class HikeLite {
     setupMobileAndThemeListeners() {
         const mobileMenuToggle = document.getElementById('mobileMenuToggle');
         const darkModeToggle = document.getElementById('darkModeToggle');
+ 		const nav = document.getElementById('mainNav');
 
         if (mobileMenuToggle) {
             mobileMenuToggle.addEventListener('click', () => {
@@ -363,12 +364,31 @@ class HikeLite {
             });
         }
 
+		// Delegated: close mobile menu when any item/link inside nav is clicked
+		if (nav) {
+			nav.addEventListener('click', (e) => {
+				if (!this.mobileMenuOpen) return;
+				const clickedNavButton = e.target.closest('.nav-btn');
+				const clickedLink = e.target.closest('a');
+				if (clickedNavButton || clickedLink) {
+					this.closeMobileMenu();
+				}
+			});
+		}
+
         // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
             if (this.mobileMenuOpen && !e.target.closest('.nav') && !e.target.closest('.mobile-menu-toggle')) {
                 this.closeMobileMenu();
             }
         });
+
+		// Close mobile menu on Escape key
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && this.mobileMenuOpen) {
+				this.closeMobileMenu();
+			}
+		});
     }
 
     // Local Storage Methods
