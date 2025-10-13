@@ -1,50 +1,18 @@
 name,category,manufacturer,product,weight,quantity,consumable
 Baseball Cap,Accessories,Jack Wolfskin,Blue cap,80,1,false
-Buff,Accessories,SHMG or Nomads,,70,1,false
-Gloves,Accessories,Berghaus,Gore Tex Kamchatka,200,1,false
-Gloves,Accessories,Decathlon,Kiprun Thermal,40,1,false
 Rucksack,Big 3,Atom Packs,Atom 40+,790,1,false
-Sleeping Bag,Big 3,Rab,2 Season half bag (yellow),620,1,false
 Sleeping Pad,Big 3,Sea to Summit,Ultralight Insulated Air Sleeping Mat,296,1,false
 Camera,Camera,Sony,A7Cii,513,1,false
 Lens,Camera,Sony,Sony FE4-5.6/28-60,184,1,false
 Fleece,Clothing,Macpac,macpac nitro alpha90,148,1,false
 Shorts,Clothing,Patagonia,Baggies,180,1,false
-Socks,Clothing,Darn Tough,Darn Tough Hike/Trek 1/4 Cushion L,66,1,false
-T Shirt Short Sleeve,Clothing,RAB,Force SS Tee,75,1,false
 Windshirt,Clothing,Patagonia,Houdini Wind Jacket,115,1,false
-Cup (large),Cookware,Foldacup,Large cup,46,2,false
 Fire Starter,Cookware,Light My Fire,Swedish Firesteel,60,1,false
-Gas cannister,Cookware,Decathlon,Small 90g gas,185,1,true
-Spoons,Cookware,Navaris,Titanium long spoons,22,2,false
-Stove,Cookware,BTS,BTS 3000T,26,1,false
 Ultralight Pot,Cookware,Evernew,Pasta Pot,120,1,false
-Coffee Bags,Food,Taylors,Coffee bags,10,2,true
 Dehydrated Meals,Food,Adventure Nutrition,Evening meals,170,1,true
 Energy Bars,Food,Mercadona,Energy bars,30,4,true
 Trail mix,Food,Various,Fruit & Nuts,100,1,true
 Camp Slipper,Footware,Zpacks,Ultralight Camp Shoes,59,1,false
 Trail Shoes,Footware,La Sportiva,La Sportiva TX5 Low GTX,1100,1,false
-Waterproof Jacket,Jackets,OMM,Halo XL,110,1,false
-First Aid Kit (small),Miscellaneous,Misc,,125,1,false
-Glasses,Miscellaneous,Kodak,,30,1,false
-Sunglasses,Miscellaneous,Kodak,,30,1,false
-Trekking Pole,Miscellaneous,Overmont,,235,1,false
-Umbrella,Miscellaneous,Six Moon Designs,Silver Shadow Umbrella,213,1,false
-Valuables + Wallet,Miscellaneous,Atelier Longue,Cards cash ID keys,175,1,false
-Water Bottle,Miscellaneous,nalgene,Nalgene 1L,109,1,false
-Water Filter,Miscellaneous,Sawyer,32oz Pouch + large filter,137,1,false
-Waterproof Dry Bag,Miscellaneous,Exped,Fold Dry Bag S 5 litres yellow,30,1,false
-Waterproof Dry Bag,Miscellaneous,Exped,Fold Dry Bag XS 3 litres orange,28,1,false
 InReach Mini 2,Tech,Garmin,Garmin inReach Mini 2,112,1,false
-Phone,Tech,OnePlus,9,220,1,false
-Indigestion tablets,Toiletries,Bianacid,For pack of 15,26,1,true
-Inhaler,Toiletries,,,50,1,false
-Lip Cream,Toiletries,Carmex,,23,1,false
-Medications,Toiletries,,,5,1,true
-Tissues,Toiletries,Bosque Verde,Mercadona pack of 10,28,1,true
-Tissues,Toiletries,Mercadona,Bulk large,4,1,true
-Toilet paper,Toiletries,Misc.,For emergency use,20,1,false
-Zero Tabs,Toiletries,,,4,1,false
-
 

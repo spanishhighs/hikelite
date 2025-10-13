@@ -436,6 +436,13 @@ select {
     border-radius: 12px;
     transition: all 0.2s ease;
 }
+/* Dark mode: brighten packing list items */
+body.dark-mode .packing-item { background: #2e4055; color: #f1f5f9; border: 1px solid rgba(255,255,255,0.08); }
+body.dark-mode .packing-item:hover { background: #39506b; }
+body.dark-mode .item-info .name { color: #ffffff; }
+body.dark-mode .item-info .details { color: #e5ecf5; }
+body.dark-mode .item-weight-display { color: #eaf0f7; }
+body.dark-mode .weight-breakdown { color: #cbd5e1; }
 
 .packing-item:hover {
     background: #e9ecef;
@@ -521,6 +528,7 @@ select {
     font-size: 0.9rem;
     color: #666;
 }
+body.dark-mode .worn-toggle { color: #e5ecf5; }
 
 .worn-toggle input[type="checkbox"],
 .shared-toggle input[type="checkbox"] {
@@ -536,6 +544,7 @@ select {
     font-size: 0.9rem;
     color: #666;
 }
+body.dark-mode .shared-toggle { color: #e5ecf5; }
 
 .shared-toggle input[type="checkbox"] {
     accent-color: #ffc107;
@@ -584,12 +593,21 @@ select {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Dark mode overrides for Statistics card */
+body.dark-mode .category-breakdown {
+    background: #33465e;
+    color: #f1f5f9;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
 .category-breakdown h3 {
     color: #333;
     font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: 1rem;
 }
+body.dark-mode .category-breakdown h3 { color: #ffffff; }
 
 .category-chart {
     display: flex;
@@ -631,6 +649,11 @@ select {
     margin-bottom: 0.5rem;
     transition: all 0.2s ease;
 }
+body.dark-mode .item-row { background: #2e4055; color: #eaf0f7; }
+body.dark-mode .item-row:hover { background: #39506b; }
+body.dark-mode .item-info .item-name { color: #ffffff; }
+body.dark-mode .item-info .item-details, body.dark-mode .item-stats { color: #e5ecf5; }
+body.dark-mode .item-stats .total-weight, body.dark-mode .item-stats .carried-weight, body.dark-mode .item-stats .worn-weight { color: #eaf0f7; }
 
 .item-row:hover {
     background: #e9ecef;
@@ -1055,6 +1078,12 @@ select {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Dark mode overrides for Help/How to Use content */
+body.dark-mode .help-section {
+    background: #33465e;
+    color: #f1f5f9;
+}
+
 .help-section h3 {
     color: #333;
     font-size: 1.5rem;
@@ -1132,6 +1161,11 @@ select {
     padding: 1.5rem;
     border-left: 4px solid #667eea;
 }
+body.dark-mode .weight-card-explanation {
+    background: #2e4055;
+    color: #eaf0f7;
+    border-left-color: #5a8dee;
+}
 
 .weight-card-explanation.total {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1156,6 +1190,15 @@ select {
     border-radius: 12px;
     padding: 1.5rem;
     border-left: 4px solid #28a745;
+}
+body.dark-mode .worn-weight-example {
+    background: #254a36;
+    border-left-color: #2ecc71;
+}
+body.dark-mode .worn-weight-example h4,
+body.dark-mode .worn-weight-example p,
+body.dark-mode .worn-weight-example ul {
+    color: #d9fbe2;
 }
 
 .worn-weight-example h4 {
@@ -1193,6 +1236,12 @@ select {
     text-align: center;
     transition: transform 0.2s ease;
 }
+body.dark-mode .feature-card {
+    background: #2e4055;
+    color: #eaf0f7;
+}
+body.dark-mode .feature-card h4 { color: #ffffff; }
+body.dark-mode .feature-card p { color: #e5ecf5; }
 
 .feature-card:hover {
     transform: translateY(-2px);
@@ -1235,6 +1284,12 @@ select {
     min-width: 200px;
     flex-shrink: 0;
 }
+body.dark-mode .workflow-step {
+    background: #2e4055;
+    color: #eaf0f7;
+}
+body.dark-mode .workflow-content h4 { color: #ffffff; }
+body.dark-mode .workflow-content p { color: #e5ecf5; }
 
 .workflow-icon {
     background: #667eea;
@@ -1283,6 +1338,14 @@ select {
     padding: 1.5rem;
     border-left: 4px solid #ffc107;
 }
+body.dark-mode .tip-card {
+    background: linear-gradient(135deg, #5c4f26 0%, #6b5a29 100%);
+    color: #fff6d5;
+    border-left-color: #ffd34d;
+}
+body.dark-mode .tip-card h4,
+body.dark-mode .tip-card p,
+body.dark-mode .tip-card i { color: #fff6d5; }
 
 .tip-card i {
     color: #856404;
@@ -1312,6 +1375,10 @@ select {
     margin: 1rem 0;
     border: 1px solid #e9ecef;
 }
+body.dark-mode .csv-format {
+    background: #2e4055;
+    border-color: #536579;
+}
 
 .csv-header {
     background: #667eea;
@@ -1331,6 +1398,10 @@ select {
     padding: 1rem;
     font-family: 'Courier New', monospace;
     font-size: 0.9rem;
+}
+body.dark-mode .csv-example {
+    background: #1f2a37;
+    color: #eaf0f7;
 }
 
 .csv-header span,
@@ -1373,6 +1444,29 @@ select {
     padding: 2rem;
     margin-bottom: 2rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+/* Dark mode overrides for About content boxes */
+body.dark-mode .about-section {
+    background: #33465e;
+    color: #f1f5f9;
+}
+body.dark-mode .about-section h3 { color: #ffffff; }
+body.dark-mode .about-section p { color: #e5ecf5; }
+
+.highlight-card {
+    background: white;
+}
+body.dark-mode .highlight-card {
+    background: #2e4055;
+    color: #eaf0f7;
+}
+.feature-item {
+    background: transparent;
+}
+body.dark-mode .feature-item {
+    background: #2e4055;
+    border-radius: 12px;
+    padding: 1rem;
 }
 
 .about-section h3 {
@@ -1686,7 +1780,7 @@ select {
 /* Dark Mode Styles */
 body.dark-mode {
     background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-    color: #ecf0f1;
+    color: #f1f5f9; /* Lighter base text */
 }
 
 body.dark-mode .header {
@@ -1695,11 +1789,11 @@ body.dark-mode .header {
 }
 
 body.dark-mode .logo {
-    color: #3498db;
+    color: #5dade2;
 }
 
 body.dark-mode .nav-btn {
-    color: #bdc3c7;
+    color: #e2e8f0;
 }
 
 body.dark-mode .nav-btn:hover {
@@ -1712,20 +1806,44 @@ body.dark-mode .nav-btn.active {
     color: white;
 }
 
+/* Headings and general text in dark mode */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+    color: #ffffff; /* Ensure headings are bright */
+}
+
+body.dark-mode p,
+body.dark-mode li,
+body.dark-mode .text-muted {
+    color: #e5ecf5; /* Slightly lighter paragraphs and muted text */
+}
+
 body.dark-mode .item-card,
 body.dark-mode .weight-card,
 body.dark-mode .stat-card,
 body.dark-mode .packing-category,
 body.dark-mode .help-section,
 body.dark-mode .about-section {
-    background: #34495e;
-    color: #ecf0f1;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    /* Unified dark card surface across app */
+    background: #33465e;
+    color: #f1f5f9;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
 }
 
 body.dark-mode .item-card:hover {
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    background: #39506b;
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.45);
 }
+
+/* Ensure inventory card texts are bright in dark mode */
+body.dark-mode .item-name { color: #ffffff; }
+body.dark-mode .item-manufacturer-product { color: #e5ecf5; }
+body.dark-mode .item-details { color: #e5ecf5; }
 
 body.dark-mode .item-card.selected {
     background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
@@ -1737,8 +1855,8 @@ body.dark-mode .weight-card.total {
 }
 
 body.dark-mode .packing-item {
-    background: #2c3e50;
-    color: #ecf0f1;
+    background: #2e4055;
+    color: #f1f5f9;
 }
 
 body.dark-mode .packing-item:hover {
@@ -1756,15 +1874,15 @@ body.dark-mode .packing-item.shared {
 }
 
 body.dark-mode .modal-content {
-    background: #34495e;
-    color: #ecf0f1;
+    background: #3b4c62;
+    color: #f1f5f9;
 }
 
 body.dark-mode .form-group input,
 body.dark-mode .form-group select {
     background: #2c3e50;
     border: 1px solid #7f8c8d;
-    color: #ecf0f1;
+    color: #f1f5f9;
 }
 
 body.dark-mode .form-group input:focus,
@@ -1776,7 +1894,12 @@ body.dark-mode .form-group select:focus {
 body.dark-mode .search-box input {
     background: #2c3e50;
     border: 1px solid #7f8c8d;
-    color: #ecf0f1;
+    color: #f1f5f9;
+}
+
+/* Improve input placeholder readability in dark mode */
+body.dark-mode ::placeholder {
+    color: #cbd5e1;
 }
 
 body.dark-mode .search-box input:focus {
@@ -1786,7 +1909,7 @@ body.dark-mode .search-box input:focus {
 body.dark-mode select {
     background: #2c3e50;
     border: 1px solid #7f8c8d;
-    color: #ecf0f1;
+    color: #f1f5f9;
 }
 
 body.dark-mode .weight-unit-selector {
@@ -1797,7 +1920,7 @@ body.dark-mode .weight-unit-selector {
 
 body.dark-mode .weight-unit-selector select {
     background: #34495e;
-    color: #ecf0f1;
+    color: #f1f5f9;
 }
 
 /* Mobile Menu Styles */
@@ -1878,9 +2001,9 @@ body.dark-mode .category-list {
 }
 
 body.dark-mode .category-item {
-    background: #34495e;
+    background: #3b4c62;
     border: 1px solid #7f8c8d;
-    color: #ecf0f1;
+    color: #f1f5f9;
 }
 
 .category-item:last-child {
@@ -1893,7 +2016,7 @@ body.dark-mode .category-item {
 }
 
 body.dark-mode .category-name {
-    color: #ecf0f1;
+    color: #ffffff;
 }
 
 .category-stats {
@@ -1903,7 +2026,7 @@ body.dark-mode .category-name {
 }
 
 body.dark-mode .category-stats {
-    color: #bdc3c7;
+    color: #dbe4ee;
 }
 
 .category-actions {
