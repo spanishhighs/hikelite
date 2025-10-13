@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HikeLite - Ultralight Gear Management</title>
+    <link rel="stylesheet" href="styles2.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-mountain"></i>
+                    <h1>HikeLite</h1>
+                </div>
+                
+                <div class="header-controls">
+                    <!-- Dark mode toggle -->
+                    <button class="dark-mode-toggle" id="darkModeToggle" title="Toggle Dark Mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    
+                    <!-- Mobile menu toggle -->
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                
+                <nav class="nav" id="mainNav">
+                    <button class="nav-btn active" data-tab="inventory">
+                        <i class="fas fa-boxes"></i>
+                        <span class="nav-text">Inventory</span>
+                    </button>
+                    <button class="nav-btn" data-tab="packing">
+                        <i class="fas fa-ellipsis-v"></i>
+                        <span class="nav-text">Packing List</span>
+                    </button>
+                    <button class="nav-btn" data-tab="stats">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="nav-text">Statistics</span>
+                    </button>
+                    <button class="nav-btn" data-tab="help">
+                        <i class="fas fa-question-circle"></i>
+                        <span class="nav-text">How to Use</span>
+                    </button>
+                    <button class="nav-btn" data-tab="about">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="nav-text">About</span>
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Inventory Tab -->
+            <div class="tab-content active" id="inventory">
+                <div class="inventory-header">
+                    <h2>Gear Inventory</h2>
+                    <div class="inventory-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Search gear...">
+                        </div>
+                        <select id="categoryFilter">
+                            <option value="">All Categories</option>
+                        </select>
+                        <div class="weight-unit-selector">
+                            <label for="weightUnit">Weight Unit:</label>
+                            <select id="weightUnit">
+                                <option value="g">Grams (g)</option>
+                                <option value="oz">Ounces (oz)</option>
+                                <option value="lb">Pounds (lb)</option>
+                            </select>
+                        </div>
+                        <div class="import-export-controls">
+                            <button class="btn btn-secondary" id="importInventoryBtn">
+                                <i class="fas fa-upload"></i>
+                                Import
+                            </button>
+                            <button class="btn btn-secondary" id="exportInventoryBtn">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                            <button class="btn btn-secondary" id="importCsvBtn">
+                                <i class="fas fa-file-csv"></i>
+                                CSV
+                            </button>
+                        </div>
+                        <button class="btn btn-secondary" id="clearInventoryBtn">
+                            <i class="fas fa-trash"></i>
+                            Clear All
+                        </button>
+                        <button class="btn btn-secondary" id="manageCategoriesBtn">
+                            <i class="fas fa-tags"></i>
+                            Manage Categories
+                        </button>
+                        <button class="btn btn-primary" id="addItemBtn">
+                            <i class="fas fa-plus"></i>
+                            Add Item
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="inventory-grid" id="inventoryGrid">
+                    <!-- Inventory items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Packing List Tab -->
+            <div class="tab-content" id="packing">
+                <div class="packing-header">
+                    <h2>Packing List</h2>
+                    <div class="packing-controls" id="packingControls">
+                        <div class="import-export-controls">
+                            <button class="btn btn-secondary" id="importPackingBtn">
+                                <i class="fas fa-upload"></i>
+                                Import List
+                            </button>
+                            <button class="btn btn-secondary" id="exportPackingBtn">
+                                <i class="fas fa-download"></i>
+                                Export JSON
+                            </button>
+                            <button class="btn btn-secondary" id="exportPdfBtn">
+                                <i class="fas fa-file-pdf"></i>
+                                Export PDF
+                            </button>
+                        </div>
+                        <button class="btn btn-secondary" id="clearPackingBtn">
+                            <i class="fas fa-trash"></i>
+                            Clear All
+                        </button>
+                        <button class="btn btn-primary" id="savePackingBtn">
+                            <i class="fas fa-save"></i>
+                            Save List
+                        </button>
+                    </div>
+                </div>
+
+                <div class="weight-summary">
+                    <div class="weight-card">
+                        <h3>Own Weight Carried</h3>
+                        <span class="weight-value" id="ownWeight">0g</span>
+                    </div>
+                    <div class="weight-card">
+                        <h3>Shared Weight Carried</h3>
+                        <span class="weight-value" id="sharedWeight">0g</span>
+                    </div>
+                    <div class="weight-card">
+                        <h3>Backpack Base Weight</h3>
+                        <span class="weight-value" id="baseWeight">0g</span>
+                    </div>
+                    <div class="weight-card">
+                        <h3>Weight of Consumables</h3>
+                        <span class="weight-value" id="consumableWeight">0g</span>
+                    </div>
+                    <div class="weight-card">
+                        <h3>Total Backpack Weight</h3>
+                        <span class="weight-value" id="totalBackpackWeight">0g</span>
+                    </div>
+                    <div class="weight-card">
+                        <h3>Weight Worn</h3>
+                        <span class="weight-value" id="wornWeight">0g</span>
+                    </div>
+                    <div class="weight-card total">
+                        <h3>Total Weight</h3>
+                        <span class="weight-value" id="totalWeight">0g</span>
+                    </div>
+                </div>
+
+                <div class="packing-categories" id="packingCategories">
+                    <!-- Packing list items organized by category -->
+                </div>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div class="tab-content" id="stats">
+                <div class="stats-header">
+                    <h2>Packing List Statistics</h2>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Packing List Items</h3>
+                        <span class="stat-value" id="totalItems">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Categories Used</h3>
+                        <span class="stat-value" id="totalCategories">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Lightest Item</h3>
+                        <span class="stat-value" id="lightestItem">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Heaviest Item</h3>
+                        <span class="stat-value" id="heaviestItem">-</span>
+                    </div>
+                </div>
+
+                <div class="category-breakdown">
+                    <h3>Packing List Items (Heaviest to Lightest)</h3>
+                    <div class="category-chart" id="categoryChart">
+                        <!-- Item weight breakdown will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Tab -->
+            <div class="tab-content" id="help">
+                <div class="help-header">
+                    <h2>How to Use HikeLite</h2>
+                    <p>Your complete guide to ultralight gear management</p>
+                </div>
+
+                <div class="help-content">
+                    <!-- Getting Started -->
+                    <section class="help-section">
+                        <h3><i class="fas fa-play-circle"></i> Getting Started</h3>
+                        <div class="help-steps">
+                            <div class="help-step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h4>Import Your Gear</h4>
+                                    <p>Start by importing your existing gear inventory using the <strong>Import</strong> button. You can import from:</p>
+                                    <ul>
+                                        <li><strong>JSON files</strong> - Previous HikeLite exports</li>
+                                        <li><strong>CSV files</strong> - Spreadsheet data (use the <a href="sample-inventory.csv">sample CSV</a> as a template)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="help-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h4>Add Missing Items</h4>
+                                    <p>Use the <strong>Add Item</strong> button to add any gear not in your import file. Include:</p>
+                                    <ul>
+                                        <li>Item name and category</li>
+                                        <li>Manufacturer and product details</li>
+                                        <li>Weight in grams</li>
+                                        <li>Mark consumable items</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="help-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h4>Build Your Pack</h4>
+                                    <p>Switch to the <strong>Packing List</strong> tab and add items from your inventory. Adjust quantities and mark items as worn or shared.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Weight Management -->
+                    <section class="help-section">
+                        <h3><i class="fas fa-weight-hanging"></i> Understanding Weight Calculations</h3>
+                        <div class="weight-explanation">
+                            <div class="weight-card-explanation">
+                                <h4>Own Weight Carried</h4>
+                                <p>Items you carry personally in your pack (not shared, not worn)</p>
+                            </div>
+                            <div class="weight-card-explanation">
+                                <h4>Shared Weight Carried</h4>
+                                <p>Items shared with hiking partners (divided among group)</p>
+                            </div>
+                            <div class="weight-card-explanation">
+                                <h4>Backpack Base Weight</h4>
+                                <p>Own + Shared weight (your base pack weight)</p>
+                            </div>
+                            <div class="weight-card-explanation">
+                                <h4>Weight of Consumables</h4>
+                                <p>Food, fuel, and other items that get lighter as you use them</p>
+                            </div>
+                            <div class="weight-card-explanation">
+                                <h4>Total Backpack Weight</h4>
+                                <p>Base weight + consumables (everything in your pack)</p>
+                            </div>
+                            <div class="weight-card-explanation">
+                                <h4>Weight Worn</h4>
+                                <p>Items worn on your body (clothing, shoes, etc.)</p>
+                            </div>
+                            <div class="weight-card-explanation total">
+                                <h4>Total Weight</h4>
+                                <p>Everything combined - your complete load</p>
+                            </div>
+                        </div>
+                        
+                        <div class="worn-weight-example">
+                            <h4>Example: Worn Weight Logic</h4>
+                            <p>If you have <strong>2 pairs of socks (80g each)</strong> and mark one as worn:</p>
+                            <ul>
+                                <li><strong>Quantity:</strong> 2 (total pairs)</li>
+                                <li><strong>Own Weight Carried:</strong> 80g (1 pair in pack)</li>
+                                <li><strong>Weight Worn:</strong> 80g (1 pair worn)</li>
+                                <li><strong>Total:</strong> 160g (both pairs accounted for)</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- Features Guide -->
+                    <section class="help-section">
+                        <h3><i class="fas fa-cogs"></i> Key Features</h3>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <i class="fas fa-search"></i>
+                                <h4>Search & Filter</h4>
+                                <p>Find gear quickly by name, manufacturer, or category. Use the search box and category dropdown to narrow down your inventory.</p>
+                            </div>
+                            <div class="feature-card">
+                                <i class="fas fa-exchange-alt"></i>
+                                <h4>Import/Export</h4>
+                                <p>Import from JSON or CSV files. Export your inventory and packing lists for backup or sharing with others.</p>
+                            </div>
+                            <div class="feature-card">
+                                <i class="fas fa-file-pdf"></i>
+                                <h4>PDF Export</h4>
+                                <p>Generate printable packing lists with weight summaries. Perfect for trip planning and sharing with hiking partners.</p>
+                            </div>
+                            <div class="feature-card">
+                                <i class="fas fa-balance-scale"></i>
+                                <h4>Unit Conversion</h4>
+                                <p>Switch between grams, ounces, and pounds. All weights update automatically when you change units.</p>
+                            </div>
+                            <div class="feature-card">
+                                <i class="fas fa-mobile-alt"></i>
+                                <h4>Mobile Friendly</h4>
+                                <p>Works perfectly on phones and tablets. Use it in the field to check your pack weight and make adjustments.</p>
+                            </div>
+                            <div class="feature-card">
+                                <i class="fas fa-database"></i>
+                                <h4>Local Storage</h4>
+                                <p>All data saved in your browser. No accounts needed, works offline, and your data stays private.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Workflow -->
+                    <section class="help-section">
+                        <h3><i class="fas fa-route"></i> Recommended Workflow</h3>
+                        <div class="workflow-steps">
+                            <div class="workflow-step">
+                                <div class="workflow-icon"><i class="fas fa-upload"></i></div>
+                                <div class="workflow-content">
+                                    <h4>1. Import Existing Inventory</h4>
+                                    <p>Load your gear database from previous exports or CSV files</p>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">
+                                <div class="workflow-icon"><i class="fas fa-plus"></i></div>
+                                <div class="workflow-content">
+                                    <h4>2. Add New Items</h4>
+                                    <p>Expand your inventory with new gear purchases</p>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">
+                                <div class="workflow-icon"><i class="fas fa-download"></i></div>
+                                <div class="workflow-content">
+                                    <h4>3. Export Updated Inventory</h4>
+                                    <p>Save your complete gear database for backup</p>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">
+                                <div class="workflow-icon"><i class="fas fa-backpack"></i></div>
+                                <div class="workflow-content">
+                                    <h4>4. Build Packing List</h4>
+                                    <p>Select items for your trip and adjust quantities</p>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">
+                                <div class="workflow-icon"><i class="fas fa-chart-line"></i></div>
+                                <div class="workflow-content">
+                                    <h4>5. Optimize Weight</h4>
+                                    <p>Use statistics to identify heavy categories and make adjustments</p>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">
+                                <div class="workflow-icon"><i class="fas fa-file-pdf"></i></div>
+                                <div class="workflow-content">
+                                    <h4>6. Export Packing List</h4>
+                                    <p>Generate PDF for printing or share JSON with others</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Tips -->
+                    <section class="help-section">
+                        <h3><i class="fas fa-lightbulb"></i> Pro Tips</h3>
+                        <div class="tips-grid">
+                            <div class="tip-card">
+                                <i class="fas fa-weight"></i>
+                                <h4>Weigh Everything</h4>
+                                <p>Use a digital scale to get accurate weights. Even small items add up in ultralight hiking.</p>
+                            </div>
+                            <div class="tip-card">
+                                <i class="fas fa-tags"></i>
+                                <h4>Use Categories</h4>
+                                <p>Organize gear by categories (Big 3, Clothing, etc.) to quickly find items and analyze weight distribution.</p>
+                            </div>
+                            <div class="tip-card">
+                                <i class="fas fa-users"></i>
+                                <h4>Track Shared Items</h4>
+                                <p>Mark shared gear to see your actual personal weight vs. group weight.</p>
+                            </div>
+                            <div class="tip-card">
+                                <i class="fas fa-tshirt"></i>
+                                <h4>Worn Weight Strategy</h4>
+                                <p>Mark heavy clothing as worn to see your true base weight. This helps with ultralight goals.</p>
+                            </div>
+                            <div class="tip-card">
+                                <i class="fas fa-chart-bar"></i>
+                                <h4>Use Statistics</h4>
+                                <p>Check the Statistics tab to see which categories are heaviest in your current pack.</p>
+                            </div>
+                            <div class="tip-card">
+                                <i class="fas fa-save"></i>
+                                <h4>Regular Backups</h4>
+                                <p>Export your inventory regularly. Local storage can be cleared by browsers.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- CSV Format -->
+                    <section class="help-section">
+                        <h3><i class="fas fa-file-csv"></i> CSV Import Format</h3>
+                        <p>Your CSV file should have these columns (in any order):</p>
+                        <div class="csv-format">
+                            <div class="csv-header">
+                                <span>name</span>
+                                <span>category</span>
+                                <span>manufacturer</span>
+                                <span>product</span>
+                                <span>weight</span>
+                                <span>quantity</span>
+                                <span>consumable</span>
+                            </div>
+                            <div class="csv-example">
+                                <span>Sleeping Bag</span>
+                                <span>Big 3</span>
+                                <span>Rab</span>
+                                <span>2 Season half bag</span>
+                                <span>620</span>
+                                <span>1</span>
+                                <span>false</span>
+                            </div>
+                        </div>
+                        <p><strong>Note:</strong> Use the provided <code><a href="sample-inventory.csv">sample-inventory.csv</a></code> file as a template.</p>
+                    </section>
+                </div>
+            </div>
+
+            <!-- About Tab -->
+            <div class="tab-content" id="about">
+                <div class="about-header">
+                    <h2>About HikeLite</h2>
+                    <p>Ultralight gear management for the modern backpacker</p>
+                </div>
+
+                <div class="about-content">
+                    <!-- Personal Story -->
+                    <section class="about-section">
+                        <div class="about-story">
+                            <h3><i class="fas fa-mountain"></i> The Story Behind HikeLite</h3>
+                            <div class="story-content">
+                                <p>Hey there! I'm Richard, creator of HikeLite. I'm an avid backpacker with years of experience under my belt. In the past I've relied on scraps of paper, or more lately, online apps to keep track of my gear and pack weight.</p>
+                                
+                                <p>Let me tell you, there are some amazing online tools out there. I've tried most of them myself. But as I get older and focus more on reducing pack weight, I realize that none of the existing solutions quite fit what I am looking for. So, I decided to create something for myself that would fill what I perceived as a gap.</p>
+                                
+                                <div class="highlight-quote">
+                                    <p><strong>Hence, I wrote this for me. It works for me and it fits what I want out of a backpacking gear list management system. If you find it useful, that's awesome too!</strong></p>
+                                </div>
+                                
+                                <p>If you can't wait to get going, then skip this intro page and head straight to the Gear List which provides for all your gear and packing list management. You may also find the How to Use section some assistance.</p>
+                            </div>
+                            
+                            <div class="story-image">
+                                <img src="images/glacier-hikers.jpg" alt="2 people sat on a glacier with very large packs" class="about-image">
+                                <p class="image-caption"><em>Wish I'd known about the lightweight gear revolution way back in 2006!</em></p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Highlights -->
+                    <section class="about-section">
+                        <h3><i class="fas fa-star"></i> Highlights</h3>
+                        <div class="highlights-grid">
+                            <div class="highlight-card">
+                                <i class="fas fa-code"></i>
+                                <h4>Open Source</h4>
+                                <p>Free to use, fork or share</p>
+                            </div>
+                            <div class="highlight-card">
+                                <i class="fas fa-user-plus"></i>
+                                <h4>No Registration</h4>
+                                <p>No account registration required</p>
+                            </div>
+                            <div class="highlight-card">
+                                <i class="fas fa-database"></i>
+                                <h4>Local Storage</h4>
+                                <p>Saved locally, no cloud required</p>
+                            </div>
+                            <div class="highlight-card">
+                                <i class="fas fa-exchange-alt"></i>
+                                <h4>Import/Export</h4>
+                                <p>JSON import and export support</p>
+                            </div>
+                            <div class="highlight-card">
+                                <i class="fas fa-file-pdf"></i>
+                                <h4>PDF Export</h4>
+                                <p>Export trip packing lists as PDF</p>
+                            </div>
+                            <div class="highlight-card">
+                                <i class="fas fa-calculator"></i>
+                                <h4>Consumables</h4>
+                                <p>Calculate Water, Fuel and Food needs</p>
+                            </div>
+                            <div class="highlight-card">
+                                <i class="fas fa-share-alt"></i>
+                                <h4>Share with Friends</h4>
+                                <p>Easy sharing and collaboration</p>
+                            </div>
+                            <div class="highlight-card">
+                                <i class="fas fa-shield-alt"></i>
+                                <h4>Privacy First</h4>
+                                <p>No cookies or tracking</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Features Overview -->
+                    <section class="about-section">
+                        <h3><i class="fas fa-cogs"></i> Features</h3>
+                        
+                        <div class="features-image">
+                            <img src="images/gear-layout.jpg" alt="Some mountaineering items laid out on the bed" class="about-image">
+                        </div>
+                        
+                        <div class="features-overview">
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <div class="feature-content">
+                                    <h4>Gear Inventory Management</h4>
+                                    <p>Keep track of all your gear without losing your mind (or your tent stakes). Add details like weight, brand, whatever floats your pack. You can sort everything into categories so it's not just one big gear pile.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-backpack"></i>
+                                </div>
+                                <div class="feature-content">
+                                    <h4>Smart Packing Lists</h4>
+                                    <p>Forget the copy-paste chaos. Quickly build packing lists by grabbing stuff from your inventory. Try out different setups without unpacking your whole living room floor.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <div class="feature-content">
+                                    <h4>Weight Analysis</h4>
+                                    <p>Wondering why your pack feels like a small boulder? Get a clear breakdown of where the weight's coming from—by category—so you can trim the fat (or at least know what's weighing you down).</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-file-export"></i>
+                                </div>
+                                <div class="feature-content">
+                                    <h4>Export & Share</h4>
+                                    <p>Need to show off your ultralight setup or coordinate with a hiking buddy? Every list has a downloadable PDF you can send to whoever — no public posting required.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Philosophy -->
+                    <section class="about-section">
+                        <h3><i class="fas fa-heart"></i> Philosophy</h3>
+                        <div class="philosophy-content">
+                            <div class="philosophy-quote">
+                                <p><em>"Your buddy battling through a blizzard with a 25kg pack will really appreciate a copy of your lightweight kit list"</em></p>
+                            </div>
+                            
+                            <div class="philosophy-image">
+                                <img src="images/blizzard-hiker.jpg" alt="A person with massive pack in a blizzard" class="about-image">
+                            </div>
+                            <p>HikeLite is built on the principle that gear management should be simple, private, and focused on what matters most to backpackers: reducing weight while maintaining safety and comfort. No unnecessary complexity, no data collection, no accounts to manage.</p>
+                            
+                            <p>Whether you're a weekend warrior or a thru-hiker, HikeLite adapts to your needs. It's designed to grow with your gear collection and evolve with your hiking style.</p>
+                        </div>
+                    </section>
+
+                    <!-- Contact -->
+                    <section class="about-section">
+                        <h3><i class="fas fa-envelope"></i> Get in Touch</h3>
+                        <div class="contact-info">
+                            <p>Have questions, suggestions, or just want to share your ultralight setup? I'd love to hear from you!</p>
+                            <div class="contact-methods">
+                                <div class="contact-method">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>hikelite [at] tuta.io</span>
+                                </div>
+                                <div class="contact-method">
+                                    <i class="fab fa-mastodon"></i>
+                                    <span><a href="https://shmg.online/@elperronegro">El Perro Negro on Mastodon</a></span>
+                                </div>
+                                    <div class="contact-method">
+                                        <i class="fab fa-github"></i>
+                                        <span><a href="https://github.com/spanishhighs">github.com/spanishhighs</a></span>
+                                    </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Technical Info -->
+                    <section class="about-section">
+                        <h3><i class="fas fa-code"></i> Technical Details</h3>
+                        <div class="technical-info">
+                            <p>This application is built with modern web technologies:</p>
+                            <ul>
+                                <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript</li>
+                                <li><strong>Storage:</strong> Browser Local Storage (no server required)</li>
+                                <li><strong>Design:</strong> Mobile-first responsive design</li>
+                                <li><strong>Privacy:</strong> No tracking, no analytics, no cookies</li>
+                            </ul>
+                            <p><strong>Source Code:</strong> <a href="https://github.com/spanishhighs/hikelite">github.com/spanishhighs/hikelite</a></p>
+                            <p><strong>Privacy & Speed:</strong> This application complies with GDPR by not collecting any personal information, and with the EU Cookie Directive by not using cookies. <strong>NO TRACKERS, NO ADS, NO ANALYTICS!</strong></p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Item Modal -->
+    <div class="modal" id="addItemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Item</h3>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="addItemForm">
+                <div class="form-group">
+                    <label for="itemName">Name</label>
+                    <input type="text" id="itemName" required>
+                </div>
+                <div class="form-group">
+                    <label for="itemCategory">Category</label>
+                    <div class="category-input-group">
+                        <select id="itemCategory" required>
+                            <option value="">Select Category</option>
+                        </select>
+                        <button type="button" class="btn btn-secondary btn-small" id="addNewCategoryBtn">
+                            <i class="fas fa-plus"></i> New
+                        </button>
+                    </div>
+                    <div class="new-category-input" id="newCategoryInput" style="display: none;">
+                        <input type="text" id="newCategoryNameInput" placeholder="Enter new category name">
+                        <button type="button" class="btn btn-primary btn-small" id="confirmNewCategoryBtn">
+                            <i class="fas fa-check"></i> Add
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-small" id="cancelNewCategoryBtn">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="itemManufacturer">Manufacturer</label>
+                    <input type="text" id="itemManufacturer">
+                </div>
+                <div class="form-group">
+                    <label for="itemProduct">Product</label>
+                    <input type="text" id="itemProduct">
+                </div>
+                <div class="form-group">
+                    <label for="itemWeight">Weight (g)</label>
+                    <input type="number" id="itemWeight" required>
+                </div>
+                <div class="form-group">
+                    <label for="itemQuantity">Quantity</label>
+                    <input type="number" id="itemQuantity" value="1" min="1">
+                </div>
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="itemConsumable">
+                        Consumable
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelAdd">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Management Modal -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Manage Categories</h3>
+                <button class="modal-close" id="closeCategoryModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-form">
+                <div class="form-group">
+                    <label for="newCategoryName">Add New Category</label>
+                    <div class="input-group">
+                        <input type="text" id="newCategoryName" placeholder="Enter category name">
+                        <button type="button" class="btn btn-primary" id="addCategoryBtn">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Existing Categories</label>
+                    <div class="category-list" id="categoryList">
+                        <!-- Categories will be populated here -->
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelCategory">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file inputs for import functionality -->
+    <input type="file" id="importInventoryInput" accept=".json" style="display: none;">
+    <input type="file" id="importPackingInput" accept=".json" style="display: none;">
+    <input type="file" id="importCsvInput" accept=".csv" style="display: none;">
+
+    <!-- Include jsPDF for PDF export -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" onload="console.log('jsPDF script loaded')" onerror="console.error('jsPDF script failed to load')"></script>
+    <script>
+        // Check if jsPDF loaded
+        window.addEventListener('load', function() {
+            console.log('Page loaded, checking jsPDF...');
+            console.log('window.jsPDF:', window.jsPDF);
+            console.log('window.jspdf:', window.jspdf);
+            console.log('All window properties:', Object.keys(window).filter(key => key.toLowerCase().includes('pdf')));
+        });
+    </script>
+    <script src="script2.js?v=7"></script>
+</body>
+</html>
