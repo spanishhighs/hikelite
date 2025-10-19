@@ -10,6 +10,11 @@ class HikeLite {
         this.mobileMenuOpen = false;
         this.packingMenuOpen = false;
         
+        // Calculator properties
+        this.calculatorConstants = this.loadCalculatorConstants();
+        this.useMetric = true;
+        this.foodPlanner = null;
+        
         // Weight conversion factors (to grams)
         this.weightConversions = {
             'g': 1,
@@ -131,6 +136,9 @@ class HikeLite {
 
         // Mobile menu and dark mode
         this.setupMobileAndThemeListeners();
+
+        // Calculator
+        this.setupCalculatorListeners();
 
         // Close modal on outside click
         document.addEventListener('click', (e) => {
@@ -1562,6 +1570,430 @@ class HikeLite {
         }
         if (newCategoryNameInput) {
             newCategoryNameInput.value = '';
+        }
+    }
+
+    // Calculator Methods
+    loadCalculatorConstants() {
+        const saved = localStorage.getItem('hikeLiteConstants');
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        return {
+            ACTIVITY_FACTORS: {
+                leisurely: { water: 1.0, calories: 2000 },
+                moderate: { water: 2.0, calories: 2500 },
+                strenuous: { water: 3.0, calories: 3000 }
+            },
+            CLIMATE_FACTORS: {
+                temperate: { waterMultiplier: 1.0 },
+                hot: { waterMultiplier: 1.5 },
+                cold: { waterMultiplier: 1.0 },
+                rainy: { waterMultiplier: 1.2 }
+            },
+            FUEL_CONSTANTS: {
+                per400ml: 6,
+                per250ml: 4
+            }
+        };
+    }
+
+    setupCalculatorListeners() {
+        // Only set up if calculator tab exists
+        if (!document.getElementById('calculator')) return;
+
+        // Unit toggle buttons
+        const metricBtn = document.getElementById('toggle-metric');
+        const imperialBtn = document.getElementById('toggle-imperial');
+        
+        if (metricBtn) {
+            metricBtn.addEventListener('click', () => this.toggleCalculatorUnits(true));
+        }
+        if (imperialBtn) {
+            imperialBtn.addEventListener('click', () => this.toggleCalculatorUnits(false));
+        }
+
+        // Form inputs
+        const form = document.getElementById('trip-form');
+        if (form) {
+            form.addEventListener('input', () => this.handleCalculatorInputChange());
+        }
+
+        // Reset button
+        const resetBtn = document.getElementById('reset-btn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => this.resetCalculator());
+        }
+
+        // Assumptions modal
+        const showAssumptionsBtn = document.getElementById('show-assumptions');
+        const closeAssumptionsBtn = document.getElementById('close-assumptions-modal');
+        const saveAssumptionsBtn = document.getElementById('save-assumptions');
+        const resetDefaultsBtn = document.getElementById('reset-defaults');
+
+        if (showAssumptionsBtn) {
+            showAssumptionsBtn.addEventListener('click', () => this.showAssumptionsModal());
+        }
+        if (closeAssumptionsBtn) {
+            closeAssumptionsBtn.addEventListener('click', () => this.hideModal('assumptions-modal'));
+        }
+        if (saveAssumptionsBtn) {
+            saveAssumptionsBtn.addEventListener('click', () => this.saveAssumptions());
+        }
+        if (resetDefaultsBtn) {
+            resetDefaultsBtn.addEventListener('click', () => this.resetCalculatorDefaults());
+        }
+
+        // Initialize calculator
+        this.initializeCalculator();
+    }
+
+    initializeCalculator() {
+        this.toggleCalculatorUnits(true);
+        this.foodPlanner = new FoodPlanner(this);
+        this.calculateConsumables();
+    }
+
+    toggleCalculatorUnits(useMetricSystem) {
+        this.useMetric = useMetricSystem;
+        const metricBtn = document.getElementById('toggle-metric');
+        const imperialBtn = document.getElementById('toggle-imperial');
+        
+        if (metricBtn) metricBtn.classList.toggle('active', this.useMetric);
+        if (imperialBtn) imperialBtn.classList.toggle('active', !this.useMetric);
+        
+        // Update unit labels
+        document.querySelectorAll('#water-unit').forEach(el => {
+            el.textContent = this.useMetric ? '(L/day)' : '(oz/day)';
+        });
+        
+        this.calculateConsumables();
+    }
+
+    handleCalculatorInputChange() {
+        // Debounce to prevent excessive calculations
+        clearTimeout(this.calculatorTimeout);
+        this.calculatorTimeout = setTimeout(() => {
+            if (this.foodPlanner) this.foodPlanner.calculateFood();
+            this.calculateConsumables();
+        }, 300);
+    }
+
+    calculateConsumables() {
+        const days = parseInt(document.getElementById('trip-days')?.value) || 1;
+        const people = parseInt(document.getElementById('people')?.value) || 1;
+        const activity = document.getElementById('activity')?.value || 'moderate';
+        const climate = document.getElementById('climate')?.value || 'temperate';
+        const eveningMeals = parseInt(document.getElementById('evening-meals')?.value) || 0;
+        const smallBoils = parseInt(document.getElementById('small-boils')?.value) || 0;
+
+        // Water calculation
+        const waterPerDay = this.calculatorConstants.ACTIVITY_FACTORS[activity].water * 
+                           this.calculatorConstants.CLIMATE_FACTORS[climate].waterMultiplier;
+        const totalWater = waterPerDay * days * people;
+
+        // Food calculation
+        const caloriesPerDay = this.calculatorConstants.ACTIVITY_FACTORS[activity].calories;
+        const totalCalories = caloriesPerDay * days * people;
+
+        // Fuel calculation
+        let fuelPerPersonPerDay = 
+            (eveningMeals * this.calculatorConstants.FUEL_CONSTANTS.per400ml) + 
+            (smallBoils * this.calculatorConstants.FUEL_CONSTANTS.per250ml);
+        
+        if (climate === 'cold') {
+            fuelPerPersonPerDay *= 1.2;
+        }
+        const totalFuel = fuelPerPersonPerDay * days * people;
+
+        // Weight calculation
+        const totalWeight = (
+            (totalWater * 1000) +          // Water weight in grams (1L = 1000g)
+            (totalCalories / 1000 * 1000) + // Food weight estimate (1kg per 1000kcal)
+            totalFuel                      // Fuel weight in grams
+        ) / 1000;                       // Convert to kg
+
+        // Update results display
+        this.updateCalculatorResults({
+            waterPerDay, totalWater, caloriesPerDay, totalCalories,
+            fuelPerPersonPerDay, totalFuel, totalWeight, eveningMeals, smallBoils, climate
+        });
+    }
+
+    updateCalculatorResults(data) {
+        const { waterPerDay, totalWater, caloriesPerDay, totalCalories, 
+                fuelPerPersonPerDay, totalFuel, totalWeight, eveningMeals, smallBoils, climate } = data;
+
+        // Update water result
+        const waterResult = document.getElementById('water-result');
+        if (waterResult) {
+            waterResult.textContent = 
+                `${this.formatCalculatorUnits(waterPerDay, 'volume')}/day/person (${this.formatCalculatorUnits(totalWater, 'volume')} total)`;
+        }
+
+        // Update food result
+        const foodResult = document.getElementById('food-result');
+        if (foodResult) {
+            foodResult.textContent = 
+                `${caloriesPerDay} kcal/day/person (${totalCalories} kcal total)`;
+        }
+
+        // Update fuel result
+        const fuelResult = document.getElementById('fuel-result');
+        if (fuelResult) {
+            fuelResult.innerHTML = 
+                `${this.formatCalculatorUnits(fuelPerPersonPerDay, 'smallWeight')}/day/person = ` +
+                `(${eveningMeals} × ${this.formatCalculatorUnits(this.calculatorConstants.FUEL_CONSTANTS.per400ml, 'smallWeight')}) + ` +
+                `(${smallBoils} × ${this.formatCalculatorUnits(this.calculatorConstants.FUEL_CONSTANTS.per250ml, 'smallWeight')})` +
+                (climate === 'cold' ? ' × 1.2 (cold weather)' : '');
+        }
+
+        // Update trip total
+        const tripTotalResult = document.getElementById('trip-total-result');
+        if (tripTotalResult) {
+            tripTotalResult.textContent = 
+                `Fuel: ${this.formatCalculatorUnits(totalFuel, 'smallWeight')} | ` +
+                `Water: ${this.formatCalculatorUnits(totalWater, 'volume')} | ` +
+                `Food: ${totalCalories}kcal`;
+        }
+
+        // Update weight result
+        const weightResult = document.getElementById('weight-result');
+        if (weightResult) {
+            weightResult.textContent = this.formatCalculatorUnits(totalWeight, 'weight');
+        }
+
+        // Show results
+        const resultsDiv = document.getElementById('results');
+        if (resultsDiv) {
+            resultsDiv.style.display = 'block';
+        }
+    }
+
+    formatCalculatorUnits(value, unitType) {
+        const CONVERSION = {
+            L_TO_OZ: 33.814,
+            KG_TO_LB: 2.20462,
+            G_TO_OZ: 0.035274
+        };
+
+        if (!this.useMetric) {
+            switch(unitType) {
+                case 'volume':
+                    value *= CONVERSION.L_TO_OZ;
+                    return `${value.toFixed(1)} oz`;
+                case 'weight':
+                    value *= CONVERSION.KG_TO_LB;
+                    return `${value.toFixed(1)} lbs`;
+                case 'smallWeight':
+                    value *= CONVERSION.G_TO_OZ;
+                    return `${value.toFixed(1)} oz`;
+                default:
+                    return value;
+            }
+        }
+        switch(unitType) {
+            case 'volume':
+                return `${value.toFixed(1)} L`;
+            case 'weight':
+                return `${value.toFixed(1)} kg`;
+            case 'smallWeight':
+                return `${value.toFixed(1)} g`;
+            default:
+                return value;
+        }
+    }
+
+    resetCalculator() {
+        const form = document.getElementById('trip-form');
+        if (form) {
+            form.reset();
+        }
+        const resultsDiv = document.getElementById('results');
+        if (resultsDiv) {
+            resultsDiv.style.display = 'none';
+        }
+    }
+
+    showAssumptionsModal() {
+        this.showModal('assumptions-modal');
+        this.initAssumptionsForm();
+    }
+
+    initAssumptionsForm() {
+        const constants = this.calculatorConstants.ACTIVITY_FACTORS;
+        
+        const leisurelyWater = document.getElementById('leisurely-water');
+        const leisurelyCal = document.getElementById('leisurely-cal');
+        const moderateWater = document.getElementById('moderate-water');
+        const moderateCal = document.getElementById('moderate-cal');
+        const strenuousWater = document.getElementById('strenuous-water');
+        const strenuousCal = document.getElementById('strenuous-cal');
+
+        if (leisurelyWater) leisurelyWater.value = constants.leisurely.water;
+        if (leisurelyCal) leisurelyCal.value = constants.leisurely.calories;
+        if (moderateWater) moderateWater.value = constants.moderate.water;
+        if (moderateCal) moderateCal.value = constants.moderate.calories;
+        if (strenuousWater) strenuousWater.value = constants.strenuous.water;
+        if (strenuousCal) strenuousCal.value = constants.strenuous.calories;
+    }
+
+    saveAssumptions() {
+        const constants = this.calculatorConstants.ACTIVITY_FACTORS;
+        
+        const leisurelyWater = document.getElementById('leisurely-water');
+        const leisurelyCal = document.getElementById('leisurely-cal');
+        const moderateWater = document.getElementById('moderate-water');
+        const moderateCal = document.getElementById('moderate-cal');
+        const strenuousWater = document.getElementById('strenuous-water');
+        const strenuousCal = document.getElementById('strenuous-cal');
+
+        if (leisurelyWater) constants.leisurely.water = parseFloat(leisurelyWater.value);
+        if (leisurelyCal) constants.leisurely.calories = parseInt(leisurelyCal.value);
+        if (moderateWater) constants.moderate.water = parseFloat(moderateWater.value);
+        if (moderateCal) constants.moderate.calories = parseInt(moderateCal.value);
+        if (strenuousWater) constants.strenuous.water = parseFloat(strenuousWater.value);
+        if (strenuousCal) constants.strenuous.calories = parseInt(strenuousCal.value);
+        
+        localStorage.setItem('hikeLiteConstants', JSON.stringify(this.calculatorConstants));
+        this.calculateConsumables();
+        this.hideModal('assumptions-modal');
+    }
+
+    resetCalculatorDefaults() {
+        localStorage.removeItem('hikeLiteConstants');
+        this.calculatorConstants = this.loadCalculatorConstants();
+        this.calculateConsumables();
+        this.hideModal('assumptions-modal');
+    }
+}
+
+// FoodPlanner Class
+class FoodPlanner {
+    constructor(hikeLite) {
+        this.hikeLite = hikeLite;
+        this.foodItems = JSON.parse(localStorage.getItem('hikeLiteFoodItems')) || [];
+        this.container = document.getElementById('food-items-container');
+        this.initEventListeners();
+        if (this.foodItems.length === 0) this.initSampleFoods();
+        this.renderFoodItems();
+        this.calculateFood();
+    }
+
+    initEventListeners() {
+        const addFoodBtn = document.getElementById('add-food-item');
+        if (addFoodBtn) {
+            addFoodBtn.addEventListener('click', () => this.addFoodItem());
+        }
+    }
+
+    renderFoodItems() {
+        if (!this.container) return;
+        this.container.innerHTML = '';
+        this.foodItems.forEach(food => {
+            this.addFoodItemToDOM(food);
+        });
+    }
+
+    addFoodItem(food = {}) {
+        this.foodItems.push({
+            name: food.name || '',
+            qty: food.qty || 1,
+            kcal: food.kcal || 0
+        });
+        this.saveFoodItems();
+        this.addFoodItemToDOM(food);
+    }
+
+    addFoodItemToDOM(food) {
+        if (!this.container) return;
+        
+        const item = document.createElement('div');
+        item.className = 'food-item';
+        item.innerHTML = `
+            <input type="text" class="food-name" value="${food.name || ''}" placeholder="Food name">
+            <input type="number" class="food-qty" value="${food.qty || 1}" min="1" placeholder="Qty">
+            <input type="number" class="food-kcal" value="${food.kcal || ''}" min="1" placeholder="kcal/unit">
+            <button class="remove-food">×</button>
+            <span class="food-total">0 kcal</span>
+        `;
+        this.container.appendChild(item);
+        
+        // Add event listeners
+        item.querySelectorAll('.food-qty, .food-kcal').forEach(input => {
+            input.addEventListener('input', () => {
+                this.updateFoodItem(item);
+                this.calculateFood();
+            });
+        });
+        
+        item.querySelector('.remove-food').addEventListener('click', () => {
+            item.remove();
+            this.foodItems = this.foodItems.filter(f => 
+                f.name !== item.querySelector('.food-name').value
+            );
+            this.saveFoodItems();
+            this.calculateFood();
+        });
+    }
+
+    updateFoodItem(item) {
+        const name = item.querySelector('.food-name').value;
+        const index = this.foodItems.findIndex(f => f.name === name);
+        if (index !== -1) {
+            this.foodItems[index] = {
+                name,
+                qty: parseInt(item.querySelector('.food-qty').value) || 0,
+                kcal: parseInt(item.querySelector('.food-kcal').value) || 0
+            };
+            this.saveFoodItems();
+        }
+    }
+
+    saveFoodItems() {
+        localStorage.setItem('hikeLiteFoodItems', JSON.stringify(this.foodItems));
+    }
+
+    initSampleFoods() {
+        const samples = [
+            { name: "Coffee sachets", qty: 1, kcal: 10 },
+            { name: "Soup packets", qty: 1, kcal: 150 },
+            { name: "Hot chocolate sachets", qty: 1, kcal: 125 },
+            { name: "Granola bars", qty: 1, kcal: 200 },
+            { name: "100g Oats/milk", qty: 1, kcal: 500 },
+            { name: "100g of fruit/nuts", qty: 1, kcal: 500 },
+            { name: "Evening meal", qty: 1, kcal: 600 }
+        ];
+        samples.forEach(food => this.addFoodItem(food));
+    }
+
+    calculateFood() {
+        let totalConsumed = 0;
+        
+        document.querySelectorAll('.food-item').forEach(item => {
+            const qty = parseInt(item.querySelector('.food-qty').value) || 0;
+            const kcal = parseInt(item.querySelector('.food-kcal').value) || 0;
+            const total = qty * kcal;
+            item.querySelector('.food-total').textContent = `${total} kcal`;
+            totalConsumed += total;
+        });
+      
+        // Get fresh values each time
+        const activity = document.getElementById('activity')?.value || 'moderate';
+        const days = parseInt(document.getElementById('trip-days')?.value) || 1;
+        const required = this.hikeLite.calculatorConstants.ACTIVITY_FACTORS[activity].calories * days;
+      
+        const totalConsumedEl = document.getElementById('total-consumed');
+        const totalRequiredEl = document.getElementById('total-required');
+        const diffElement = document.getElementById('calorie-difference');
+        
+        if (totalConsumedEl) totalConsumedEl.textContent = totalConsumed;
+        if (totalRequiredEl) totalRequiredEl.textContent = required;
+      
+        if (diffElement) {
+            const difference = totalConsumed - required;
+            diffElement.textContent = `${Math.abs(difference)} kcal ${difference >= 0 ? 'surplus' : 'deficit'}`;
+            diffElement.style.color = difference >= 0 ? '#27ae60' : '#e74c3c';
         }
     }
 }

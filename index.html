@@ -43,6 +43,10 @@
                         <i class="fas fa-chart-line"></i>
                         <span class="nav-text">Statistics</span>
                     </button>
+                    <button class="nav-btn" data-tab="calculator">
+                        <i class="fas fa-calculator"></i>
+                        <span class="nav-text">Consumables</span>
+                    </button>
                     <button class="nav-btn" data-tab="help">
                         <i class="fas fa-question-circle"></i>
                         <span class="nav-text">How to Use</span>
@@ -206,6 +210,180 @@
                     <h3>Packing List Items (Heaviest to Lightest)</h3>
                     <div class="category-chart" id="categoryChart">
                         <!-- Item weight breakdown will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consumables Calculator Tab -->
+            <div class="tab-content" id="calculator">
+                <div class="calculator-header">
+                    <h2>Consumables Calculator</h2>
+                    <p>Smart trip calculator! Plan perfect hikes with precise estimates for water, food, and fuel needs based on your trip specifics.</p>
+                </div>
+
+                <div class="unit-toggle">
+                    <button id="toggle-metric" class="toggle-btn active">Metric</button>
+                    <button id="toggle-imperial" class="toggle-btn">Imperial</button>
+                </div>
+
+                <form id="trip-form" class="calculator-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="trip-days">Trip Duration (Days)</label>
+                            <input type="number" id="trip-days" min="1" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="people">Number of People</label>
+                            <input type="number" id="people" min="1" value="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="activity">Activity Level
+                                <span class="info-tooltip">(?)
+                                    <span class="tooltip-text">
+                                        <strong>Calculation Base Values:</strong><br>
+                                        Leisurely: 1.0L water, 2000 kcal<br>
+                                        Moderate: 2.0L water, 2500 kcal<br>
+                                        Strenuous: 3.0L water, 3000 kcal
+                                    </span>
+                                </span>
+                            </label>
+                            <select id="activity" required>
+                                <option value="leisurely">Leisurely (e.g., flat terrain)</option>
+                                <option value="moderate" selected>Moderate (mixed hiking)</option>
+                                <option value="strenuous">Strenuous (e.g., elevation gain)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="climate">Climate/Season
+                                <span class="info-tooltip">(?)
+                                    <span class="tooltip-text">
+                                        <strong>Water Multipliers:</strong><br>
+                                        Temperate: ×1.0<br>
+                                        Hot/Dry: ×1.5<br>
+                                        Cold: ×1.0 (but +20% fuel)<br>
+                                        Rainy/Humid: ×1.2
+                                    </span>
+                                </span>
+                            </label>
+                            <select id="climate" required>
+                                <option value="temperate">Temperate</option>
+                                <option value="hot">Hot/Dry</option>
+                                <option value="cold">Cold</option>
+                                <option value="rainy">Rainy/Humid</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="evening-meals">Evening Meals (per day, per person)</label>
+                            <input type="number" id="evening-meals" min="0" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="small-boils">Small Boils (per day, per person)
+                                <span class="info-tooltip">(?)
+                                    <span class="tooltip-text">
+                                        <strong>Fuel Estimates:</strong><br>
+                                        Evening meal: 6g per 400ml boil<br>
+                                        Small boil: 4g per 250ml boil<br>
+                                        Cold weather: +20% fuel usage
+                                    </span>
+                                </span>
+                            </label>
+                            <input type="number" id="small-boils" min="0" value="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="reset-btn" class="btn btn-secondary">Reset</button>
+                        <button type="button" id="show-assumptions" class="btn btn-secondary">Customize Assumptions</button>
+                    </div>
+                </form>
+
+                <!-- Food Planner Section -->
+                <div id="food-planner" class="food-planner">
+                    <h3>Food Inventory</h3>
+                    <p><em>Preloaded with some of our normal backpacking goodies! Add more or delete, up to you.</em></p>
+                    <div id="food-items-container">
+                        <!-- Dynamic items will appear here -->
+                    </div>
+                    <button id="add-food-item" type="button" class="btn btn-primary">＋ Add Food</button>
+                    
+                    <div id="food-summary" class="food-summary">
+                        <strong>Calorie Comparison:</strong>
+                        <div>Consumed: <span id="total-consumed">0</span> kcal</div>
+                        <div>Required: <span id="total-required">0</span> kcal</div>
+                        <div id="calorie-difference" class="calorie-difference"></div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="results" class="calculator-results">
+                    <h3>Estimated Consumables</h3>
+                    <div class="results-table">
+                        <div class="result-row">
+                            <span class="result-label">Water</span>
+                            <span id="water-result" class="result-value">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Food</span>
+                            <span id="food-result" class="result-value">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Fuel</span>
+                            <span id="fuel-result" class="result-value">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Total for Trip</span>
+                            <span id="trip-total-result" class="result-value">-</span>
+                        </div>
+                        <div class="result-row total">
+                            <span class="result-label">Total Weight</span>
+                            <span id="weight-result" class="result-value">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assumptions Modal -->
+                <div id="assumptions-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Customize Calculation Assumptions</h3>
+                            <button class="modal-close" id="close-assumptions-modal">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="modal-form">
+                            <div class="assumptions-table">
+                                <div class="table-header">
+                                    <div>Activity Level</div>
+                                    <div>Water <span id="water-unit">(L/day)</span></div>
+                                    <div>Calories (kcal)</div>
+                                </div>
+                                <div class="table-row">
+                                    <div>Leisurely</div>
+                                    <div><input type="number" id="leisurely-water" value="1.0" step="0.1"></div>
+                                    <div><input type="number" id="leisurely-cal" value="2000" step="100"></div>
+                                </div>
+                                <div class="table-row">
+                                    <div>Moderate</div>
+                                    <div><input type="number" id="moderate-water" value="2.0" step="0.1"></div>
+                                    <div><input type="number" id="moderate-cal" value="2500" step="100"></div>
+                                </div>
+                                <div class="table-row">
+                                    <div>Strenuous</div>
+                                    <div><input type="number" id="strenuous-water" value="3.0" step="0.1"></div>
+                                    <div><input type="number" id="strenuous-cal" value="3000" step="100"></div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" id="save-assumptions" class="btn btn-primary">Save Changes</button>
+                                <button type="button" id="reset-defaults" class="btn btn-secondary">Reset to Defaults</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -756,6 +934,6 @@
             console.log('All window properties:', Object.keys(window).filter(key => key.toLowerCase().includes('pdf')));
         });
     </script>
-    <script src="script2.js?v=9"></script>
+    <script src="script2.js?v=10"></script>
 </body>
 </html>
